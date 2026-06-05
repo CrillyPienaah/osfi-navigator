@@ -46,12 +46,12 @@ def get_vectorstore():
     if _vectorstore is None:
         embeddings = get_embeddings()
         if os.path.exists(CHROMA_PATH) and os.listdir(CHROMA_PATH):
-            _vectorstore = Chroma(persist_directory=CHROMA_PATH, embedding_function=embeddings)
+            _vectorstore = Chroma(, embedding_function=embeddings)
         else:
             docs = get_builtin_corpus()
             splitter = RecursiveCharacterTextSplitter(chunk_size=800, chunk_overlap=100)
             chunks = splitter.split_documents(docs)
-            _vectorstore = Chroma.from_documents(documents=chunks, embedding=embeddings, persist_directory=CHROMA_PATH)
+            _vectorstore = Chroma.from_documents(documents=chunks, embedding=embeddings, )
     return _vectorstore
 
 async def query_rag(question: str, model: str = "gpt-4o-mini", domain: str = "all") -> dict:
@@ -80,3 +80,4 @@ async def query_rag(question: str, model: str = "gpt-4o-mini", domain: str = "al
             seen.add(key)
             sources.append({"title": d.metadata.get("title", "Unknown"), "section": d.metadata.get("section", "Unknown"), "excerpt": d.page_content[:200] + "...", "relevance": 0.9})
     return {"answer": answer, "sources": sources, "model_used": model, "grounded": grounded, "confidence": round(confidence, 2)}
+
